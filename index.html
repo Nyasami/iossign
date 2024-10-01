@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS App Signer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1c;
+            color: #fff;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background-color: #333;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+        input[type="file"], input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: #222;
+            color: #fff;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #1e90ff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0c74d1;
+        }
+        .output-link {
+            margin-top: 20px;
+            color: #1e90ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>iOS App Signer</h2>
+        <form id="signForm">
+            <label for="ipaFile">IPA File *</label>
+            <input type="file" id="ipaFile" name="ipa" required>
+        
+            <label for="zipFile">P12 and Mobile Provisioning ZIP *</label>
+            <input type="file" id="zipFile" name="zip" required>
+        
+            <label for="password">P12 Password *</label>
+            <input type="password" id="password" name="password" required>
+        
+            <label for="bundleID">Change Bundle ID (optional)</label>
+            <input type="text" id="bundleID" name="bundleID" placeholder="com.example.app">
+        
+            <button type="submit">Upload and Sign</button>
+        </form>
+        
+
+        <div class="output-link" id="downloadLink"></div>
+    </div>
+
+    <script>
+        document.getElementById('signForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const form = document.getElementById('signForm');
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const downloadUrl = await fetch('generate-ota', {
+                        method: 'POST',
+                    }).then(res => res.json());
+                    setTimeout(() => {
+                        document.getElementById('downloadLink').innerHTML = `${downloadUrl["otaLink"]}`;
+                        window.open(downloadUrl["otaLink"], '_blank');
+                    }, 1000);
+                } else {
+                    alert('Failed to sign the IPA.');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                alert('An error occurred during the signing process.');
+            }
+        });
+    </script>
+</body>
+</html>
