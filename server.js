@@ -67,6 +67,7 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
                 console.error(`Error signing app: ${stderr}`);
                 return res.status(500).json({ error: 'Failed to sign IPA' });
             }
+            console.log(stdout);
 
             // Send the signed IPA file back to the user
             res.download(signedIpaPath);
@@ -80,8 +81,7 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
 app.post('/generate-ota', (req, res) => {
     const signedIpaPath = path.join(__dirname, 'signed', 'signedApp.ipa');
     const bundleId = req.body.bundleID || 'com.example.app';
-    const appName = req.body.appName || 'Example App';
-    
+    const appName = req.body.appName || 'ESign';
     createPlist(signedIpaPath, bundleId, appName, (err, plistPath) => {
         if (err) {
             return res.status(500).json({ error: 'Failed to generate manifest.plist' });
