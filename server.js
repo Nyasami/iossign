@@ -86,7 +86,7 @@ app.post('/generate-ota', (req, res) => {
         if (err) {
             return res.status(500).json({ error: 'Failed to generate manifest.plist' });
         }
-        const otaLink = `itms-services://?action=download-manifest&url=http://14.225.217.233:3000/signed/${path.basename(plistPath)}`;
+        const otaLink = `itms-services://?action=download-manifest&url=https:sign.khoindvn.io.vn/signed/${path.basename(plistPath)}`;
         res.json({ otaLink });
     });
 });
@@ -111,7 +111,7 @@ function createPlist(signedIpaPath, bundleId, appName, callback) {
                 <key>kind</key>
                 <string>software-package</string>
                 <key>url</key>
-                <string>http://14.225.217.233:3000//signed/${path.basename(signedIpaPath)}</string>
+                <string>https://sign.khoindvn.io.vn/signed/${path.basename(signedIpaPath)}</string>
               </dict>
             </array>
             <key>metadata</key>
