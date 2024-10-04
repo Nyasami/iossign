@@ -164,14 +164,10 @@
                 const response = await fetch('/upload', {
                     method: 'POST',
                     body: formData
-                });
+                }).then(res => res.json());
 
                 if (response.ok) {
                     const blob = await response.blob();
-
-                    const downloadUrl = await fetch('generate-ota', {
-                        method: 'POST',
-                    }).then(res => res.json());
                     setTimeout(() => {
                         document.querySelector('.download-link').innerText = `${downloadUrl["otaLink"]}`;
                         window.open(downloadUrl["otaLink"], '_blank');
