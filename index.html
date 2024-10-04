@@ -74,7 +74,7 @@
             <button type="submit">Upload and Sign</button>
         </form>
         
-        <a href="" class="download-link" hidden>Install App</a>
+        <div class="download-link"></div>
     </div>
 
     <script>
@@ -96,8 +96,7 @@
                         method: 'POST',
                     }).then(res => res.json());
                     setTimeout(() => {
-                        document.getElementById('download-link').setAttribute('href', downloadUrl["otaLink"]);
-                        document.getElementById('download-link').removeAttribute('hidden');
+                        document.querySelector('.download-link').innerText = `${downloadUrl["otaLink"]}`;
                         window.open(downloadUrl["otaLink"], '_blank');
                     }, 1000);
                 } else {

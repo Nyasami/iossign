@@ -86,7 +86,7 @@ app.post('/generate-ota', (req, res) => {
         if (err) {
             return res.status(500).json({ error: 'Failed to generate manifest.plist' });
         }
-        const otaLink = `itms-services://?action=download-manifest&url=https:sign.khoindvn.io.vn/signed/${path.basename(plistPath)}`;
+        const otaLink = `itms-services://?action=download-manifest&url=https://sign.khoindvn.io.vn/signed/${path.basename(plistPath)}`;
         res.json({ otaLink });
     });
 });
