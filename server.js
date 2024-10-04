@@ -24,14 +24,34 @@ app.get('/', (req, res) => {
 // Endpoint to handle the signing process
 app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (req, res) => {
     try {
-        const ipaPath = req.files['ipa'][0].path;
+        let ipaPath = ''
         const zipPath = req.files['zip'][0].path;
-        const password = req.body.password;
-        const bundleId = req.body.bundleID || null;  // Optional bundle ID
-        const signedIpaPath = path.join(__dirname, 'signed', 'signedApp.ipa');
+        const password = req.body.password; 
+
+        const app = req.body.app
+        console.log('app:', app)
+        switch (app) {
+            case 'Esign':
+                ipaPath = path.join(__dirname, 'apps', 'Esign.ipa');
+                break;
+            case 'Scarlet':
+                ipaPath = path.join(__dirname, 'apps', 'Scarlet.ipa');
+                break;  
+        }
+
+        if (!ipaPath) {
+            res.status(400).json({ error: 'Invalid app' });
+            throw new Error('Invalid app');
+        }
+
+        // Create a new random id for the session
+        const sessionId = Math.random().toString(36).substring(7);
+
+        await fs.promises.mkdir(path.join(__dirname, 'uploads', sessionId), { recursive: true });
+
 
         // Create a directory to unzip the contents
-        const unzipDir = path.join(__dirname, 'uploads', 'unzipped');
+        const unzipDir = path.join(__dirname, 'uploads', sessionId, 'unzipped');
         await fs.promises.mkdir(unzipDir, { recursive: true });
 
         // Unzip the uploaded file
@@ -45,50 +65,51 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
         const mobileProvisionPath = files.find(file => file.endsWith('.mobileprovision'));
 
         if (!p12Path || !mobileProvisionPath) {
+            res.status(400).json({ error: 'Missing P12 or mobile provisioning file in the ZIP' });
             throw new Error('Missing P12 or mobile provisioning file in the ZIP');
         }
 
         // Path for the extracted files
         const fullP12Path = path.join(unzipDir, p12Path);
         const fullMobileProvisionPath = path.join(unzipDir, mobileProvisionPath);
+        const outputDir = path.join(__dirname, 'signed', sessionId);
+        fs.mkdirSync(outputDir, { recursive: true });
+        const signedIpaPath = path.join(__dirname, 'signed', sessionId, 'signed.ipa');
 
         // zsign command
         let command = `./zsign -k "${fullP12Path}" -p ${password} -m "${fullMobileProvisionPath}" -o "${signedIpaPath}" -b sign.khoindvn.io.vn "${ipaPath}" `;
-
-        // Add optional bundle ID
-        if (bundleId) {
-            command += ` -b ${bundleId}`;
-        }
 
         console.log('Signing command:', command);
         // Execute the signing process
         exec(command, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error signing app: ${stderr}`);
-                return res.status(500).json({ error: 'Failed to sign IPA' });
             }
             console.log(stdout);
 
             // Send the signed IPA file back to the user
             res.download(signedIpaPath);
         });
+        // after the device is signed, delete the uploaded files
+        // fs.unlinkSync(zipPath);
+        // fs.unlinkSync(fullP12Path);
+        // fs.unlinkSync(fullMobileProvisionPath);
+        // fs.rmdirSync(unzipDir, { recursive: true });
+
+        const bundleId = 'sign.khoindvn.io.vn';
+        const appName = req.body.app
+        createPlist(signedIpaPath, bundleId, appName, sessionId, (err, plistPath) => {
+            if (err) {
+                return res.status(500).json({ error: 'Failed to generate manifest.plist' });
+            }
+            const otaLink = `itms-services://?action=download-manifest&url=https://sign.khoindvn.io.vn/signed/${path.basename(plistPath)}`;
+            res.json({ otaLink });
+        });
+
     } catch (err) {
         console.error('Error:', err);
         res.status(500).json({ error: 'An error occurred during the signing process' });
     }
-});
-
-app.post('/generate-ota', (req, res) => {
-    const signedIpaPath = path.join(__dirname, 'signed', 'signedApp.ipa');
-    const bundleId = req.body.bundleID || 'sign.khoindvn.io.vn';
-    const appName = req.body.appName || 'ESign';
-    createPlist(signedIpaPath, bundleId, appName, (err, plistPath) => {
-        if (err) {
-            return res.status(500).json({ error: 'Failed to generate manifest.plist' });
-        }
-        const otaLink = `itms-services://?action=download-manifest&url=https://sign.khoindvn.io.vn/signed/${path.basename(plistPath)}`;
-        res.json({ otaLink });
-    });
 });
 
 
@@ -96,7 +117,7 @@ app.listen(3000, () => {
     console.log('Server running on port 3000');
 });
 
-function createPlist(signedIpaPath, bundleId, appName, callback) {
+function createPlist(signedIpaPath, bundleId, appName, sessionId, callback) {
     const plistContent = `
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -130,7 +151,7 @@ function createPlist(signedIpaPath, bundleId, appName, callback) {
       </dict>
     </plist>`;
     
-    const plistPath = path.join(__dirname, 'signed', 'manifest.plist');
+    const plistPath = path.join(__dirname, 'signed', sessionId, 'manifest.plist');
     fs.writeFile(plistPath, plistContent, (err) => {
         if (err) {
             return callback(`Error creating plist: ${err}`);
