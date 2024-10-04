@@ -53,7 +53,7 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
         const fullMobileProvisionPath = path.join(unzipDir, mobileProvisionPath);
 
         // zsign command
-        let command = `./zsign -k "${fullP12Path}" -p ${password} -m "${fullMobileProvisionPath}" -o "${signedIpaPath}" "${ipaPath}" -i`;
+        let command = `./zsign -k "${fullP12Path}" -p ${password} -m "${fullMobileProvisionPath}" -o "${signedIpaPath}" -i -b sign.khoindvn.io.vn "${ipaPath}" `;
 
         // Add optional bundle ID
         if (bundleId) {
@@ -80,7 +80,7 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
 
 app.post('/generate-ota', (req, res) => {
     const signedIpaPath = path.join(__dirname, 'signed', 'signedApp.ipa');
-    const bundleId = req.body.bundleID || 'com.example.app';
+    const bundleId = req.body.bundleID || 'sign.khoindvn.io.vn';
     const appName = req.body.appName || 'ESign';
     createPlist(signedIpaPath, bundleId, appName, (err, plistPath) => {
         if (err) {
