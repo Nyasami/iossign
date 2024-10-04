@@ -53,7 +53,7 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
         const fullMobileProvisionPath = path.join(unzipDir, mobileProvisionPath);
 
         // zsign command
-        let command = `./zsign -k "${fullP12Path}" -p ${password} -m "${fullMobileProvisionPath}" -o "${signedIpaPath}" -i -b sign.khoindvn.io.vn "${ipaPath}" `;
+        let command = `./zsign -k "${fullP12Path}" -p ${password} -m "${fullMobileProvisionPath}" -o "${signedIpaPath}" -b sign.khoindvn.io.vn "${ipaPath}" `;
 
         // Add optional bundle ID
         if (bundleId) {
