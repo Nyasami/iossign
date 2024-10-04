@@ -87,8 +87,6 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
             }
             console.log(stdout);
 
-            // Send the signed IPA file back to the user
-            res.download(signedIpaPath);
         });
         // after the device is signed, delete the uploaded files
         // fs.unlinkSync(zipPath);
