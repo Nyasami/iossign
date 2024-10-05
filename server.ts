@@ -110,13 +110,6 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
             const otaLink = `itms-services://?action=download-manifest&url=https://sign.khoindvn.io.vn/signed/${sessionId}/manifest.plist`; 
             res.json({ otaLink });
 
-            exec('rm -rf uploads/*', (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`Error deleting uploaded files: ${stderr}`);
-                }
-                console.log(stdout);
-            });
-
         });
     
         
