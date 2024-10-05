@@ -89,13 +89,10 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
 
         });
         // after the device is signed, delete the uploaded files
-        // fs.unlinkSync(zipPath);
-        // fs.unlinkSync(fullP12Path);
-        // fs.unlinkSync(fullMobileProvisionPath);
-        // fs.rmdirSync(unzipDir, { recursive: true });
 
         const bundleId = 'sign.khoindvn.io.vn';
         const appName = req.body.app
+
         createPlist(signedIpaPath, bundleId, appName, sessionId, (err, plistPath) => {
             if (err) {
                 return res.status(500).json({ error: 'Failed to generate manifest.plist' });
@@ -103,7 +100,14 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
             console.log('Plist created:', plistPath);
             const otaLink = `itms-services://?action=download-manifest&url=https://sign.khoindvn.io.vn/signed/${sessionId}/manifest.plist`; 
             res.json({ otaLink });
+            fs.unlinkSync(zipPath);
+            fs.unlinkSync(fullP12Path);
+            fs.unlinkSync(fullMobileProvisionPath);
+            fs.rmdirSync(unzipDir, { recursive: true });
+
         });
+    
+        
 
     } catch (err) {
         console.error('Error:', err);
