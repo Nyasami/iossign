@@ -100,7 +100,8 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
             if (err) {
                 return res.status(500).json({ error: 'Failed to generate manifest.plist' });
             }
-            const otaLink = `itms-services://?action=download-manifest&url=https://sign.khoindvn.io.vn/signed/${path.basename(plistPath)}`;
+            console.log('Plist created:', plistPath);
+            const otaLink = `itms-services://?action=download-manifest&url=https://sign.khoindvn.io.vn/signed/${sessionId}/manifest.plist`; 
             res.json({ otaLink });
         });
 
@@ -150,6 +151,8 @@ function createPlist(signedIpaPath, bundleId, appName, sessionId, callback) {
     </plist>`;
     
     const plistPath = path.join(__dirname, 'signed', sessionId, 'manifest.plist');
+    console.log('Plist path:', plistPath);
+    console.log('signedIpaPath:', signedIpaPath);
     fs.writeFile(plistPath, plistContent, (err) => {
         if (err) {
             return callback(`Error creating plist: ${err}`);
