@@ -114,6 +114,21 @@
             margin-top: 20px;
             color: #1e90ff;
         }
+
+        .download-link {
+            width: 5em;
+            margin-top: 20px;
+            color: #fff;
+            background-color: #1e90ff;
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .download-link a {
+            color: #fff;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -143,10 +158,11 @@
         
             <button type="submit">Upload and Sign</button>
 
-            <div class="install"></div>
+            <div class="install"></div> 
+            <div class="download-link"></div>
         </form>
         
-        <div class="download-link"></div>
+       
     </div>
 
     <script>
@@ -166,11 +182,14 @@
                     body: formData
                 }).then(res => res.json());
 
-                if (response.ok) {
-                    const blob = await response.blob();
+                const downloadButton = document.querySelector('.download-link');
+                console.log(response);
+
+                if (response) {
                     setTimeout(() => {
-                        document.querySelector('.download-link').innerText = `${downloadUrl["otaLink"]}`;
-                        window.open(downloadUrl["otaLink"], '_blank');
+                        downloadButton.setAttribute('href', response["otaLink"]);
+                        downloadButton.innerHTML = `<a href="${response["otaLink"]}" target="_blank">Download</a>`;
+                        downloadButton.style.display = 'block';
                     }, 1000);
                 } else {
                     alert(`${response.statusText}`);
