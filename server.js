@@ -131,7 +131,7 @@ function createPlist(signedIpaPath, bundleId, appName, sessionId, callback) {
                 <key>kind</key>
                 <string>software-package</string>
                 <key>url</key>
-                <string>https://sign.khoindvn.io.vn/signed/${path.basename(signedIpaPath)}</string>
+                <string>https://sign.khoindvn.io.vn/signed/${sessionId}/signed.ipa</string>
               </dict>
             </array>
             <key>metadata</key>
