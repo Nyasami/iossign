@@ -1,0 +1,124 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1c1c1c;
+    color: #fff;
+    text-align: center;
+    padding: 50px;
+}
+.container {
+    margin: auto;
+    background-color: #333;
+    padding: 30px;
+    border-radius: 3em;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+h2 {
+    margin-bottom: 20px;
+}
+label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+}
+input[type="file"], input[type="text"], input[type="password"] {
+    text-align: center;
+    width: 15em;
+    padding: 10px 0;
+    margin-bottom: 15px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #222;
+    color: #fff;
+}
+button {
+    padding: 10px 20px;
+    background-color: #1e90ff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 16px;
+}
+button:hover {
+    background-color: #0c74d1;
+}
+.output-link {
+    margin-top: 20px;
+    color: #1e90ff;
+}
+.app-button {
+    width: 5em;
+    padding: 20px;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    margin: 10px;
+    background-color: #1c1c1c;
+    cursor: pointer;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+.app-button img {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+}
+
+.app-button.active {
+    background-color: #4f4f4f; /* Active state color */
+}
+
+.app-button img {
+    width: 40px;
+    height: 40px;
+}
+.apps {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+.hidden {
+    display: none;
+}
+
+.uploadButton {
+    text-align: center;
+    display: block;
+    width: 10em;
+    padding: 10px 0;
+    margin-bottom: 15px;
+    border-radius: 9999px;
+    background-color: #1e90ff;
+    color: #fff;
+    cursor: pointer;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.install {
+    margin-top: 20px;
+    color: #1e90ff;
+}
+
+.download-link {
+    width: 5em;
+    margin-top: 20px;
+    color: #fff;
+    background-color: #1e90ff;
+    padding: 10px;
+    border-radius: 10px;
+    display: none;
+}
+
+.download-link a {
+    color: #fff;
+    text-decoration: none;
+}

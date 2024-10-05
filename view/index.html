@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS App Signer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>iOS App Signer</h2>
+        <form id="signForm">
+            <div id="apps" class="apps">
+                
+            </div>
+            <p style="margin: 2px;">P12 and Mobile Provisioning ZIP</p>
+            <br>
+            <label class="uploadButton" for="zipFile">Upload ZIP</label>
+            <input class="hidden" type="file" id="zipFile" name="zip" accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed" required>
+        
+            <label for="password">P12 Password *</label>
+            <input type="password" id="password" name="password" required>
+        
+            <button type="submit">Upload and Sign</button>
+
+            <div class="install"></div> 
+            <div class="download-link"></div>
+        </form>
+        
+       
+    </div>
+
+    <script src="main.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

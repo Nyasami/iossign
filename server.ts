@@ -18,7 +18,7 @@ app.use('/signed', express.static(path.join(__dirname, 'signed')));
 
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 // Endpoint to handle the signing process
