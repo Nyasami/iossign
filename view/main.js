@@ -15,6 +15,7 @@ document.getElementById('signForm').addEventListener('submit', async function (e
         }).then(res => res.json());
 
         const downloadButton = document.querySelector('.download-link');
+        const shortButton = document.querySelector('.short-link');
         console.log(response);
 
         if (response) {
@@ -22,6 +23,13 @@ document.getElementById('signForm').addEventListener('submit', async function (e
                 downloadButton.setAttribute('href', response["otaLink"]);
                 downloadButton.innerHTML = `<a href="${response["otaLink"]}" target="_blank">Download</a>`;
                 downloadButton.style.display = 'block';
+                shortButton.innerHTML = `Short Link`;
+                shortButton.style.display = 'block';
+                shortButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    navigator.clipboard.writeText(response["tinyUrl"]);
+                    alert('Copied to clipboard');
+                });
             }, 1000);
         } else {
             alert(`${response.statusText}`);

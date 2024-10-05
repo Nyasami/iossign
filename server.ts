@@ -1,3 +1,4 @@
+const axios = require('axios');
 const express = require('express');
 const multer = require('multer');
 const { exec } = require('child_process');
@@ -5,13 +6,11 @@ const path = require('path');
 const fs = require('fs');
 const unzipper = require('unzipper');
 const bodyParser = require('body-parser');
-
 const app = express();
+require('dotenv').config();
 
 // Setup Multer for file uploads
 const upload = multer({ dest: 'uploads/' });
-// Serve static files from the 'signed' directory
-
 app.use(bodyParser.json());
 
 app.use('/signed', express.static(path.join(__dirname, 'signed')));
@@ -27,8 +26,9 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
         let ipaPath = ''
         const zipPath = req.files['zip'][0].path;
         const password = req.body.password; 
-
         const app = req.body.app
+        const sessionId = Math.random().toString(36).substring(7);
+
         console.log('app:', app)
         switch (app) {
             case 'Esign':
@@ -43,9 +43,6 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
             res.status(400).json({ error: 'Invalid app' });
             throw new Error('Invalid app');
         }
-
-        // Create a new random id for the session
-        const sessionId = Math.random().toString(36).substring(7);
 
         await fs.promises.mkdir(path.join(__dirname, 'uploads', sessionId), { recursive: true });
 
@@ -106,13 +103,17 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
             if (err) {
                 return res.status(500).json({ error: 'Failed to generate manifest.plist' });
             }
-            console.log('Plist created:', plistPath);
-            const otaLink = `itms-services://?action=download-manifest&url=https://sign.khoindvn.io.vn/signed/${sessionId}/manifest.plist`; 
-            res.json({ otaLink });
-
+            const otaLink = `itms-services://?action=download-manifest&url=https://sign.khoindvn.io.vn/signed/${sessionId}/manifest.plist`;
+            axios.post(`https://api.tinyurl.com/create?api_token=${process.env.TINY_KEY}`, {
+                url: otaLink,
+            }).then((response) => {
+                console.log('TinyURL:', response.data.data.tiny_url);
+                res.json({ otaLink: otaLink, tinyUrl: response.data.data.tiny_url });
+            }).catch((error) => {
+                console.error('Error creating TinyURL:', error);
+                res.json({ otaLink: otaLink });
+            });
         });
-    
-        
 
     } catch (err) {
         console.error('Error:', err);

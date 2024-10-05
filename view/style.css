@@ -129,6 +129,16 @@ form {
     display: none;
 }
 
+.short-link {
+    width: 5em;
+    margin-top: 20px;
+    color: #fff;
+    background-color: #1e90ff;
+    padding: 10px;
+    border-radius: 10px;
+    display: none;
+}
+
 .download-link a {
     color: #fff;
     text-decoration: none;
