@@ -28,7 +28,7 @@ document.getElementById('signForm').addEventListener('submit', async function (e
         }
     } catch (err) {
         console.error('Error:', err);
-        alert('An error occurred during the signing process.');
+        alert(err);
     }
 });
 function selectApp(button) {
@@ -41,3 +41,16 @@ function selectApp(button) {
     // Automatically select the radio input within the clicked button
     button.querySelector('input[type="radio"]').checked = true;
 }
+const fileInput = document.getElementById('zipFile');
+const fileStatus = document.getElementById('fileStatus');
+
+
+// Listen for file selection
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+        // Display file name when a file is selected
+        fileStatus.textContent = `File selected: ${fileInput.files[0].name}`;
+    } else {
+        fileStatus.textContent = 'No file selected';
+    }
+});

@@ -16,9 +16,9 @@ app.use(bodyParser.json());
 
 app.use('/signed', express.static(path.join(__dirname, 'signed')));
 
-
+app.use(express.static(path.join(__dirname, 'view')));
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+    res.sendFile(path.join(__dirname, 'view', 'index.html'));
 });
 
 // Endpoint to handle the signing process
@@ -50,7 +50,7 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
         await fs.promises.mkdir(path.join(__dirname, 'uploads', sessionId), { recursive: true });
 
 
-        // Create a directory to unzip the contents
+        // Create a directory to unzip the contents 
         const unzipDir = path.join(__dirname, 'uploads', sessionId, 'unzipped');
         await fs.promises.mkdir(unzipDir, { recursive: true });
 
@@ -61,14 +61,24 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
 
         // Find the unzipped P12 and mobileprovision files
         const files = await fs.promises.readdir(unzipDir);
-        const p12Path = files.find(file => file.endsWith('.p12'));
-        const mobileProvisionPath = files.find(file => file.endsWith('.mobileprovision'));
+        console.log('Files:', files);
+        let p12Path = files.find(file => file.endsWith('.p12'));
+        let mobileProvisionPath = files.find(file => file.endsWith('.mobileprovision'));
 
         if (!p12Path || !mobileProvisionPath) {
-            res.status(400).json({ error: 'Missing P12 or mobile provisioning file in the ZIP' });
-            throw new Error('Missing P12 or mobile provisioning file in the ZIP');
+            // find a folder inside it
+            const folders = await fs.promises.readdir(path.join(unzipDir, files[0]));
+            // find the files again in the folder
+            p12Path = folders.find(file => file.endsWith('.p12'));
+            mobileProvisionPath = folders.find(file => file.endsWith('.mobileprovision'));
+            if (!p12Path || !mobileProvisionPath) {
+                res.status(400).json({ error: 'Missing P12 or mobile provisioning file in the ZIP' });
+                throw new Error('Missing P12 or mobile provisioning file in the ZIP');
+            }
+            // Update the paths
+            p12Path = path.join(files[0], p12Path);
+            mobileProvisionPath = path.join(files[0], mobileProvisionPath);
         }
-
         // Path for the extracted files
         const fullP12Path = path.join(unzipDir, p12Path);
         const fullMobileProvisionPath = path.join(unzipDir, mobileProvisionPath);
@@ -77,7 +87,7 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
         const signedIpaPath = path.join(__dirname, 'signed', sessionId, 'signed.ipa');
 
         // zsign command
-        let command = `./zsign -k "${fullP12Path}" -p ${password} -m "${fullMobileProvisionPath}" -o "${signedIpaPath}" -b sign.khoindvn.io.vn "${ipaPath}" `;
+        let command = `./zsign -k "${fullP12Path}" -p "${password}" -m "${fullMobileProvisionPath}" -o "${signedIpaPath}" -b sign.khoindvn.io.vn "${ipaPath}"`;
 
         console.log('Signing command:', command);
         // Execute the signing process
@@ -88,8 +98,7 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
             console.log(stdout);
 
         });
-        // after the device is signed, delete the uploaded files
-
+        // wait for the signing process to complete
         const bundleId = 'sign.khoindvn.io.vn';
         const appName = req.body.app
 
@@ -100,10 +109,13 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
             console.log('Plist created:', plistPath);
             const otaLink = `itms-services://?action=download-manifest&url=https://sign.khoindvn.io.vn/signed/${sessionId}/manifest.plist`; 
             res.json({ otaLink });
-            fs.unlinkSync(zipPath);
-            fs.unlinkSync(fullP12Path);
-            fs.unlinkSync(fullMobileProvisionPath);
-            fs.rmdirSync(unzipDir, { recursive: true });
+
+            exec('rm -rf uploads/*', (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Error deleting uploaded files: ${stderr}`);
+                }
+                console.log(stdout);
+            });
 
         });
     
@@ -111,7 +123,6 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
 
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).json({ error: 'An error occurred during the signing process' });
     }
 });
 

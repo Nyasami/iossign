@@ -12,6 +12,17 @@ body {
     border-radius: 3em;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
+@media screen and (max-width: 600px) {
+    body {
+        padding: 0;
+        margin: 0;
+    }
+    .container {
+        border-radius: 0;
+        padding: 20px;
+    }
+    
+}
 h2 {
     margin-bottom: 20px;
 }
