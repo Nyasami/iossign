@@ -142,7 +142,7 @@ app.post('/api/get-uuid', (req, res) => {
     console.log('body:', req.body);
     const uuid = req.body['UDID']; // UDID will be sent here
     console.log(`Received UUID: ${uuid}`);
-    res.status(200).send('UUID received');
+    res.status(301).send('UUID received');
 });
 
 app.listen(3000, () => {
