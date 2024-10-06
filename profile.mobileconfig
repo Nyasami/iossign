@@ -17,19 +17,19 @@
         <string>ICCID</string>
     </array>
 </dict>
-    <key>PayloadOrganization</key>
-    <string>Khoindvn</string>
-    <key>PayloadDisplayName</key>
-    <string>Lay UUID cua dt</string>
-    <key>PayloadVersion</key>
-    <integer>1</integer>
-    <key>PayloadUUID</key>
-    <string>BDD0F593-5B98-47FF-A0A4-4B98E30CE451</string>
-    <key>PayloadIdentifier</key>
-    <string>sign.khoindvn.io.vn</string>
-    <key>PayloadDescription</key>
-    <string>bam vao nut cai dat de biet uuid cua may ban</string>
-    <key>PayloadType</key>
-    <string>Profile Service</string>
+<key>PayloadOrganization</key>
+<string>My Organization</string>
+<key>PayloadDisplayName</key>
+<string>Device Information (UDID)</string>
+<key>PayloadVersion</key>
+<integer>1</integer>
+<key>PayloadUUID</key>
+<string>BDD0F593-5B98-47FF-A0A4-4B98E30CE451</string>
+<key>PayloadIdentifier</key>
+<string>mx.com.hunk.getUDID</string>
+<key>PayloadDescription</key>
+<string>Knowing the UDID of my iOS device</string>
+<key>PayloadType</key>
+<string>Profile Service</string>
 </dict>
 </plist>
