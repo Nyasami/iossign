@@ -139,6 +139,7 @@ app.get('/api/get-config', (req, res) => {
 
 // Endpoint to receive UUID after installation
 app.post('/api/get-uuid', (req, res) => {
+    console.log('body:', req.body);
     const uuid = req.body['UDID']; // UDID will be sent here
     console.log(`Received UUID: ${uuid}`);
     res.status(200).send('UUID received');
