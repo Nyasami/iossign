@@ -7,7 +7,7 @@
     <key>PayloadVersion</key>
     <integer>1</integer>
     <key>PayloadIdentifier</key>
-    <string>com.example.config</string>
+    <string>sign.khoindvn.io.vn</string>
     <key>PayloadUUID</key>
     <string>12345678-1234-1234-1234-123456789abc</string>
     <key>PayloadDisplayName</key>
