@@ -86,7 +86,7 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
         const signedIpaPath = path.join(__dirname, 'signed', sessionId, 'signed.ipa');
 
         // zsign command
-        let command = `./zsign -k "${fullP12Path}" -p "${password}" -m "${fullMobileProvisionPath}" -o "${signedIpaPath}" -b sign.khoindvn.io.vn "${ipaPath}"`;
+        let command = `./zsign -k "${fullP12Path}" -p "${password}" -m "${fullMobileProvisionPath}" -o "${signedIpaPath}" -b ${bundleId} "${ipaPath}"`;
 
         console.log('Signing command:', command);
         // Execute the signing process
