@@ -15,6 +15,8 @@
     <key>PayloadContent</key>
     <array>
         <dict>
+            <key>PayloadIdentifier</key>
+            <string>sign.khoindvn.io.vn</string>
             <key>PayloadType</key>
             <string>com.apple.security.scep</string>
             <key>PayloadUUID</key>
