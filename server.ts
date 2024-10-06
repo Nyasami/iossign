@@ -100,8 +100,6 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
         }
     
         console.log(stdout);
-        res.status(200).json({ message: 'App signed successfully', output: stdout });
-    
         
     
         createPlist(signedIpaPath, bundleId, app, sessionId, (err, plistPath) => {
