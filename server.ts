@@ -22,6 +22,8 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'view', 'index.html'));
 });
 
+
+
 // Endpoint to handle the signing process
 app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (req, res) => {
     try {
@@ -124,6 +126,23 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
     }
 });
 
+app.get('/uuid', (req, res) => {
+    res.sendFile(path.join(__dirname, 'view', 'uuid.html'));
+});
+
+app.get('/api/get-config', (req, res) => {
+    console.log('Sending mobileconfig');
+    const configPath = path.join(__dirname, 'profile.mobileconfig');
+    res.setHeader('Content-Type', 'application/x-apple-aspen-config');
+    res.sendFile(configPath);
+});
+
+// Endpoint to receive UUID after installation
+app.post('/api/get-uuid', (req, res) => {
+    const uuid = req.body['UDID']; // UDID will be sent here
+    console.log(`Received UUID: ${uuid}`);
+    res.status(200).send('UUID received');
+});
 
 app.listen(3000, () => {
     console.log('Server running on port 3000');
