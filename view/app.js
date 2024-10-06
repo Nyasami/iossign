@@ -15,7 +15,7 @@ const render = (app) => {
     return `<div class="app-button" data-app="${app.name}" onclick="selectApp(this)">
         <img src="${app.img}" alt="${app.name}">
         <p>${app.name}</p>
-        <input type="radio" id="selected-app" name="app" value="${app.name}">
+        <input type="radio" name="app" value="${app.name}">
     </div>`
 }
 

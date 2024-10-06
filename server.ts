@@ -1,12 +1,14 @@
 const axios = require('axios');
 const express = require('express');
 const multer = require('multer');
-const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const unzipper = require('unzipper');
 const bodyParser = require('body-parser');
 const app = express();
+const util = require('util');
+const exec = util.promisify(require('child_process').exec); // Promisify exec
+
 require('dotenv').config();
 
 // Setup Multer for file uploads
@@ -28,7 +30,7 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
         const password = req.body.password; 
         const app = req.body.app
         const sessionId = Math.random().toString(36).substring(7);
-
+        const bundleId = 'sign.khoindvn.io.vn' + '.' + app; 
         console.log('app:', app)
         switch (app) {
             case 'Esign':
@@ -88,18 +90,21 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
 
         console.log('Signing command:', command);
         // Execute the signing process
-        exec(command, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error signing app: ${stderr}`);
-            }
-            console.log(stdout);
+        
+        const { stdout, stderr } = await exec(command);
 
-        });
-        // wait for the signing process to complete
-        const bundleId = 'sign.khoindvn.io.vn';
-        const appName = req.body.app
-
-        createPlist(signedIpaPath, bundleId, appName, sessionId, (err, plistPath) => {
+        if (stderr) {
+            console.error(`Error signing app: ${stderr}`);
+            res.status(500).json({ error: stderr });
+            return;  // Stop further execution
+        }
+    
+        console.log(stdout);
+        res.status(200).json({ message: 'App signed successfully', output: stdout });
+    
+        
+    
+        createPlist(signedIpaPath, bundleId, app, sessionId, (err, plistPath) => {
             if (err) {
                 return res.status(500).json({ error: 'Failed to generate manifest.plist' });
             }
@@ -108,15 +113,16 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
                 url: otaLink,
             }).then((response) => {
                 console.log('TinyURL:', response.data.data.tiny_url);
-                res.json({ otaLink: otaLink, tinyUrl: response.data.data.tiny_url });
+                res.status(200).json({ otaLink: otaLink, tinyUrl: response.data.data.tiny_url });
             }).catch((error) => {
                 console.error('Error creating TinyURL:', error);
-                res.json({ otaLink: otaLink });
+                res.status(200).json({ otaLink: otaLink });
             });
         });
 
     } catch (err) {
         console.error('Error:', err);
+        res.status(500).json({ error: err });
     }
 });
 
