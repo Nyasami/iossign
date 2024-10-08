@@ -14,6 +14,8 @@ require('dotenv').config();
 // Setup Multer for file uploads
 const upload = multer({ dest: 'uploads/' });
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 app.use('/signed', express.static(path.join(__dirname, 'signed')));
 
@@ -126,24 +128,16 @@ app.post('/upload', upload.fields([{ name: 'ipa' }, { name: 'zip' }]), async (re
     }
 });
 
-app.get('/uuid', (req, res) => {
-    res.sendFile(path.join(__dirname, 'view', 'uuid.html'));
-});
 
-app.get('/api/get-config', (req, res) => {
-    console.log('Sending mobileconfig');
-    const configPath = path.join(__dirname, 'profile.mobileconfig');
-    res.setHeader('Content-Type', 'application/x-apple-aspen-config');
-    res.sendFile(configPath);
-});
+app.get('/show',(req,res) => {
+    const uuid = req.query.UDID
+    const device = req.query.DEVICE_PRODUCT
 
-// Endpoint to receive UUID after installation
-app.post('/api/get-uuid', (req, res) => {
-    console.log('body:', req.body);
-    const uuid = req.body['UDID']; // UDID will be sent here
-    console.log(`Received UUID: ${uuid}`);
-    res.status(301).send('UUID received');
-});
+    console.log('----------------------------')
+    console.log('query:', req.query)
+    res.send(uuidHTML(uuid, device));
+})
+
 
 app.listen(3000, () => {
     console.log('Server running on port 3000');
@@ -192,4 +186,79 @@ function createPlist(signedIpaPath, bundleId, appName, sessionId, callback) {
         }
         callback(null, plistPath);
     });
+}
+
+
+const uuidHTML = (uuid, device) => {
+    return `
+    <html></html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Info</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .copy {
+            padding: 10px 20px;
+            background-color: #1e88e5;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100px;
+            margin: 0 auto;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy:hover {
+            background-color: #1565c0;
+        }
+        .container {
+            background-color: #242424;
+            margin: 0 2em;
+            border-radius: 2em;
+            padding: 2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>UUID của bạn là:</h1>
+        <p>${uuid}</p>
+        <div id="copy" class="copy">Copy</div>
+        <h1>Bạn đang sử dụng:</h1>
+        <p>${device}</p>
+    </div>
+    <script>
+        document.getElementById('copy').addEventListener('click', function (e) {
+                e.preventDefault();
+                navigator.clipboard.writeText("${uuid}");
+                alert('Copied to clipboard');
+            });
+    </script>
+</body>
+</html>
+    `
 }
