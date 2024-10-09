@@ -248,8 +248,7 @@ const uuidHTML = (uuid, device) => {
         <h1>UUID của bạn là:</h1>
         <p>${uuid}</p>
         <div id="copy" class="copy">Copy</div>
-        <h1>Bạn đang sử dụng:</h1>
-        <p>${device}</p>
+        <p>Copy UDID Xong ra gửi cho mình nhé</p>
     </div>
     <script>
         document.getElementById('copy').addEventListener('click', function (e) {
